@@ -1,6 +1,7 @@
 package com.blogappproject;
 
 import com.facebook.react.ReactActivity;
+import android.os.Bundle;
 
 public class MainActivity extends ReactActivity {
 
@@ -12,4 +13,8 @@ public class MainActivity extends ReactActivity {
   protected String getMainComponentName() {
     return "blogAppProject";
   }
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(null);
+}
 }
