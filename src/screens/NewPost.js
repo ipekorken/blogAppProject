@@ -8,12 +8,14 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import axios from 'axios';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {setPosts, setSearchedPosts} from '../@redux/app/action';
 import {baseUrl} from '../helpers/baseUrl';
 
 const NewPost = ({navigation}) => {
   const dispatch = useDispatch();
+  const userToken = useSelector(state => state.app.userToken);
+  const userInfo = useSelector(state => state.app.userInfo);
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
   const [img, setImg] = useState('');
@@ -29,6 +31,7 @@ const NewPost = ({navigation}) => {
       method: 'post',
       url: `${baseUrl}:3000/api/posts/sendPost`,
       headers: {
+        Authorization: `Bearer ${userToken}`,
         'Content-Type': 'application/json',
       },
       data: data,

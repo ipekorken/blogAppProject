@@ -7,6 +7,7 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import Card from '../components/Card';
 import Header from '../components/Header';
@@ -18,6 +19,43 @@ import {baseUrl} from '../helpers/baseUrl';
 const Home = ({navigation}) => {
   const dispatch = useDispatch();
   const searchedPosts = useSelector(state => state.app.searchedPosts);
+  const userToken = useSelector(state => state.app.userToken);
+  const userInfo = useSelector(state => state.app.userInfo);
+
+  const showAlert = (errTitle, errInfo) => {
+    Alert.alert(errTitle, errInfo, [
+      {
+        text: 'OK',
+        onPress: () =>
+          setTimeout(() => {
+            navigation.navigate('Login');
+          }, 400),
+      },
+    ]);
+  };
+
+  const goNewPost = () => {
+    if (userToken !== null) {
+      setTimeout(() => {
+        navigation.navigate('NewPost');
+      }, 300);
+    } else {
+      showAlert(
+        'Yeni post yüklemek için yeterli yetkiniz yok.',
+        'Post eklemek için üye olmalısınız.',
+      );
+    }
+  };
+
+  const goProfile = () => {
+    if (userToken !== null) {
+      setTimeout(() => {
+        navigation.navigate('Profile');
+      }, 300);
+    } else {
+      showAlert('Herhangi bir kullanıcı profili bulunamadı.', '');
+    }
+  };
 
   const getPosts = () => {
     var axios = require('axios');
@@ -61,7 +99,7 @@ const Home = ({navigation}) => {
   };
   return (
     <SafeAreaView style={styles.homeScreen}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={goProfile}>
         <View
           style={{
             width: 60,
@@ -90,7 +128,7 @@ const Home = ({navigation}) => {
         <SearchBar />
         <TouchableOpacity
           style={{marginLeft: 10, marginTop: 18, alignItems: 'center'}}
-          onPress={() => navigation.navigate('NewPost')}>
+          onPress={goNewPost}>
           <Image
             style={{width: 30, height: 30}}
             source={require('../assets/add.png')}

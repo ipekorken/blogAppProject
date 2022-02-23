@@ -9,12 +9,12 @@ import {
   Alert,
 } from 'react-native';
 import axios from 'axios';
-//import {useDispatch} from 'react-redux';
-//import {setUserToken, setUserInfo} from '../@redux/app/action';
+import {useDispatch} from 'react-redux';
+import {setUserToken, setUserInfo} from '../@redux/app/action';
 import {baseUrl} from '../helpers/baseUrl';
 
 const Login = ({navigation}) => {
-  //const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -51,8 +51,8 @@ const Login = ({navigation}) => {
       axios(config)
         .then(function (response) {
           if (response.data.token) {
-            //dispatch(setUserToken(response.data.token));
-            //dispatch(setUserInfo(response.data.user));
+            dispatch(setUserToken(response.data.token));
+            dispatch(setUserInfo(response.data.user));
             loginAlert('Login Successful', '');
           } else {
             showAlert('Login Failed', response.data.message);

@@ -1,8 +1,22 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React from 'react';
+import {useSelector} from 'react-redux';
 
 const Detail = ({navigation, route}) => {
   const {id, title, desc, img} = route.params;
+  const userInfo = useSelector(state => state.app.userInfo);
+
+  const deletePost = () => {
+    console.log('delete');
+  };
+
   return (
     <View style={styles.detailScreen}>
       <View style={styles.titleView}>
@@ -11,9 +25,20 @@ const Detail = ({navigation, route}) => {
       <View style={styles.imgView}>
         <Image style={styles.img} source={{uri: img}} />
       </View>
-      <View style={styles.descView}>
-        <Text style={styles.descTxt}>{desc}</Text>
-      </View>
+      <ScrollView>
+        <View style={styles.descView}>
+          <Text style={styles.descTxt}>{desc}</Text>
+        </View>
+      </ScrollView>
+      {userInfo?.isAdmin == true ? (
+        <TouchableOpacity onPress={deletePost} style={{alignItems: 'center'}}>
+          <View style={styles.btnView}>
+            <Text style={styles.btnTxt}>Sil</Text>
+          </View>
+        </TouchableOpacity>
+      ) : (
+        <></>
+      )}
       <TouchableOpacity
         onPress={() => navigation.pop()}
         style={{alignItems: 'center'}}>
@@ -48,7 +73,7 @@ const styles = StyleSheet.create({
   },
   descView: {
     marginTop: 20,
-    height: 300,
+    height: 260,
   },
   descTxt: {
     fontSize: 16,
@@ -60,6 +85,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     height: 30,
     justifyContent: 'center',
+    marginTop: 5,
   },
   btnTxt: {
     fontSize: 14,
