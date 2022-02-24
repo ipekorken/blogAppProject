@@ -20,7 +20,6 @@ const Home = ({navigation}) => {
   const dispatch = useDispatch();
   const searchedPosts = useSelector(state => state.app.searchedPosts);
   const userToken = useSelector(state => state.app.userToken);
-  const userInfo = useSelector(state => state.app.userInfo);
 
   const showAlert = (errTitle, errInfo) => {
     Alert.alert(errTitle, errInfo, [
@@ -86,12 +85,10 @@ const Home = ({navigation}) => {
         title={itemData.item.title}
         desc={itemData.item.description}
         img={itemData.item.image}
+        fav={itemData.item.isFavorite}
         goDetail={() => {
           navigation.navigate('Detail', {
             id: itemData.item._id,
-            title: itemData.item.title,
-            desc: itemData.item.description,
-            img: itemData.item.image,
           });
         }}
       />

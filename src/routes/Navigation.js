@@ -8,6 +8,7 @@ import Register from '../screens/Register';
 import Profile from '../screens/Profile';
 import Update from '../screens/Update';
 import NewPost from '../screens/NewPost';
+import FavPostList from '../screens/FavPostList';
 
 const Stack = createNativeStackNavigator();
 const Navigation = () => {
@@ -47,6 +48,11 @@ const Navigation = () => {
         <Stack.Screen
           name="Update"
           component={Update}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="FavPostList"
+          component={FavPostList}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

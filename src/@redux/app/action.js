@@ -3,6 +3,7 @@ import {
   SET_USERINFO,
   SET_POSTS,
   SET_SEARCHEDPOSTS,
+  SET_POSTINFO,
 } from './types';
 
 export const setUserToken = userToken => ({
@@ -20,4 +21,8 @@ export const setPosts = posts => ({
 export const setSearchedPosts = searchedPosts => ({
   type: SET_SEARCHEDPOSTS,
   payload: searchedPosts,
+});
+export const setPostInfo = postInfo => ({
+  type: SET_POSTINFO,
+  payload: postInfo,
 });

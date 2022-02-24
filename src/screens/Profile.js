@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import {useDispatch, useSelector} from 'react-redux';
-import {setUsers} from '../@redux/app/action';
 import {baseUrl} from '../helpers/baseUrl';
 
 const Profile = ({navigation}) => {
@@ -18,23 +17,12 @@ const Profile = ({navigation}) => {
   const userToken = useSelector(state => state.app.userToken);
   const dispatch = useDispatch();
 
-  function goHome() {
-    var config = {
-      method: 'get',
-      url: `${baseUrl}:3000/api/users`,
-      headers: {},
-    };
+  const goFavorites = () => {
+    navigation.navigate('FavPostList');
+  };
 
-    axios(config)
-      .then(function (response) {
-        dispatch(setUsers(response.data.data));
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    setTimeout(() => {
-      navigation.navigate('Home');
-    }, 300);
+  function goHome() {
+    navigation.navigate('Home');
   }
   function goUpdate() {
     navigation.navigate('Update');
@@ -119,6 +107,15 @@ const Profile = ({navigation}) => {
           <Image
             style={styles.deleteIcon}
             source={require('../assets/delete.png')}
+          />
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={goFavorites} style={styles.btnTouch}>
+        <View style={styles.edit}>
+          <Text style={styles.btnTxt}>Favorite Posts</Text>
+          <Image
+            style={styles.deleteIcon}
+            source={require('../assets/favorite.png')}
           />
         </View>
       </TouchableOpacity>

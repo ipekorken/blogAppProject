@@ -5,29 +5,178 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from 'react-native';
-import React from 'react';
-import {useSelector} from 'react-redux';
+import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {setPosts, setSearchedPosts, setPostInfo} from '../@redux/app/action';
+import {baseUrl} from '../helpers/baseUrl';
+import axios from 'axios';
 
 const Detail = ({navigation, route}) => {
-  const {id, title, desc, img} = route.params;
+  const dispatch = useDispatch();
+  const {id} = route.params;
+  const postInfo = useSelector(state => state.app.postInfo);
   const userInfo = useSelector(state => state.app.userInfo);
+  const userToken = useSelector(state => state.app.userToken);
+
+  useEffect(() => {
+    getPostInfo();
+  }, []);
+
+  const getPostInfo = () => {
+    var config = {
+      method: 'get',
+      url: `${baseUrl}:3000/api/posts/${id}`,
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+        'Content-Type': 'application/json',
+      },
+    };
+
+    axios(config)
+      .then(function (response) {
+        //console.log(JSON.stringify(response.data));
+        dispatch(setPostInfo(response.data[0]));
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  const doFavorite = () => {
+    var data = JSON.stringify({
+      isFavorite: !postInfo.isFavorite,
+    });
+    var config = {
+      method: 'patch',
+      url: `${baseUrl}:3000/api/posts/doFavorite/${id}`,
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+        'Content-Type': 'application/json',
+      },
+      data: data,
+    };
+
+    axios(config)
+      .then(function (response) {
+        //console.log(JSON.stringify(response.data));
+        getPostInfo();
+        var config = {
+          method: 'get',
+          url: `${baseUrl}:3000/api/posts`,
+          headers: {},
+        };
+
+        axios(config)
+          .then(function (response) {
+            //console.log(JSON.stringify(response.data));
+            dispatch(setPosts(response.data.data));
+            dispatch(setSearchedPosts(response.data.data));
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
 
   const deletePost = () => {
-    console.log('delete');
+    Alert.alert(
+      'Postu silmek istediğinizden emin misiniz?',
+      'Bu işlem geri alınamaz!',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            var config = {
+              method: 'delete',
+              url: `${baseUrl}:3000/api/posts/${id}`,
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            };
+
+            axios(config)
+              .then(function (response) {
+                //console.log(JSON.stringify(response.data));
+                setTimeout(() => {
+                  Alert.alert('', 'Post silindi.', [
+                    {
+                      text: 'OK',
+                      onPress: () => {
+                        var config = {
+                          method: 'get',
+                          url: `${baseUrl}:3000/api/posts`,
+                          headers: {},
+                        };
+
+                        axios(config)
+                          .then(function (response) {
+                            //console.log(JSON.stringify(response.data));
+                            dispatch(setPosts(response.data.data));
+                            dispatch(setSearchedPosts(response.data.data));
+                          })
+                          .catch(function (error) {
+                            console.log(error);
+                          });
+                        setTimeout(() => {
+                          navigation.navigate('Home');
+                        }, 1000);
+                      },
+                    },
+                  ]);
+                }, 500);
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+          },
+        },
+      ],
+    );
   };
 
   return (
     <View style={styles.detailScreen}>
       <View style={styles.titleView}>
-        <Text style={styles.titleTxt}>{title}</Text>
+        <Text style={styles.titleTxt}>{postInfo.title}</Text>
       </View>
+      <TouchableOpacity onPress={doFavorite}>
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <View
+            style={{
+              position: 'absolute',
+              alignSelf: 'flex-end',
+              width: 50,
+              height: 60,
+            }}>
+            {!postInfo?.isFavorite ? (
+              <Image
+                style={{width: 22, height: 20}}
+                source={require('../assets/emptyFav.png')}
+              />
+            ) : (
+              <Image
+                style={{width: 22, height: 20}}
+                source={require('../assets/fullFav.png')}
+              />
+            )}
+          </View>
+        </View>
+      </TouchableOpacity>
       <View style={styles.imgView}>
-        <Image style={styles.img} source={{uri: img}} />
+        <Image style={styles.img} source={{uri: postInfo?.image}} />
       </View>
       <ScrollView>
         <View style={styles.descView}>
-          <Text style={styles.descTxt}>{desc}</Text>
+          <Text style={styles.descTxt}>{postInfo?.description}</Text>
         </View>
       </ScrollView>
       {userInfo?.isAdmin == true ? (
