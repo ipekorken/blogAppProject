@@ -19,9 +19,31 @@ const Detail = ({navigation, route}) => {
   const postInfo = useSelector(state => state.app.postInfo);
   const userInfo = useSelector(state => state.app.userInfo);
   const userToken = useSelector(state => state.app.userToken);
+  const [favorites, setFavorites] = useState([]);
+
+  const getFavorites = () => {
+    var config = {
+      method: 'get',
+      url: `${baseUrl}:3000/api/favorites`,
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+        'Content-Type': 'application/json',
+      },
+    };
+
+    axios(config)
+      .then(function (response) {
+        //console.log(JSON.stringify(response.data));
+        setFavorites(response.data.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
 
   useEffect(() => {
     getPostInfo();
+    getFavorites();
   }, []);
 
   const getPostInfo = () => {
@@ -46,11 +68,14 @@ const Detail = ({navigation, route}) => {
 
   const doFavorite = () => {
     var data = JSON.stringify({
-      isFavorite: !postInfo.isFavorite,
+      user_Id: userInfo._id,
+      post_Id: postInfo._id,
+      isFavorite: !favorites.isFavorite,
     });
+
     var config = {
-      method: 'patch',
-      url: `${baseUrl}:3000/api/posts/doFavorite/${id}`,
+      method: 'post',
+      url: `${baseUrl}:3000/api/favorites/doFavorite`,
       headers: {
         Authorization: `Bearer ${userToken}`,
         'Content-Type': 'application/json',
@@ -61,22 +86,6 @@ const Detail = ({navigation, route}) => {
     axios(config)
       .then(function (response) {
         //console.log(JSON.stringify(response.data));
-        getPostInfo();
-        var config = {
-          method: 'get',
-          url: `${baseUrl}:3000/api/posts`,
-          headers: {},
-        };
-
-        axios(config)
-          .then(function (response) {
-            //console.log(JSON.stringify(response.data));
-            dispatch(setPosts(response.data.data));
-            dispatch(setSearchedPosts(response.data.data));
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
       })
       .catch(function (error) {
         console.log(error);
@@ -157,15 +166,15 @@ const Detail = ({navigation, route}) => {
               width: 50,
               height: 60,
             }}>
-            {!postInfo?.isFavorite ? (
+            {favorites.map(item => item.post_Id.includes(postInfo._id)) ? (
               <Image
                 style={{width: 22, height: 20}}
-                source={require('../assets/emptyFav.png')}
+                source={require('../assets/fullFav.png')}
               />
             ) : (
               <Image
                 style={{width: 22, height: 20}}
-                source={require('../assets/fullFav.png')}
+                source={require('../assets/emptyFav.png')}
               />
             )}
           </View>
